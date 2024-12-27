@@ -20,7 +20,7 @@ public class AtmCommand {
     @ShellMethod(key = "login")
     public String login(@ShellOption String user) {
         Customer customer = atmService.login(user);
-        return "Hello ".concat(customer.getName())
+        return "Hello, ".concat(customer.getName())
                 .concat("!").concat("\n")
                 .concat(getStringBuilder(customer).toString());
     }
@@ -81,6 +81,6 @@ public class AtmCommand {
     public String logout() {
         Customer customer = atmService.getActiveCustomer();
         atmService.logout(customer);
-        return "Goodbye ".concat(customer.getName());
+        return "Goodbye, ".concat(customer.getName());
     }
 }
