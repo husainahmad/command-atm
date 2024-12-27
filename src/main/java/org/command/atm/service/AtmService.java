@@ -132,15 +132,9 @@ public class AtmService {
 
         for (Owed owedFrom : owedList) {
             if (amount<=0) break;
-            double owedAmount;
 
-            if (owedFrom.getAmount() >= amount) {
-                owedAmount = owedFrom.getAmount() - amount;
-                amount = 0.0;
-            } else {
-                owedAmount = owedFrom.getAmount();
-                amount = amount - owedAmount;
-            }
+            double owedAmount = getOwedAmount(owedFrom, amount);
+            amount = getAmount(owedFrom, amount, owedAmount);
 
             putOwed(id, customer, targetCustomer, owedAmount, OwedType.FROM);
             putOwed(id, targetCustomer, customer, owedAmount, OwedType.TO);
@@ -183,6 +177,22 @@ public class AtmService {
         debit.setName(name);
         debit.setDebitType(debitType);
         return debit;
+    }
+
+    public double getOwedAmount(Owed owed, double amount) {
+        if (owed.getAmount() >= amount) {
+            return owed.getAmount() - amount;
+        } else {
+            return owed.getAmount();
+        }
+    }
+
+    public double getAmount(Owed owed, double amount, double owedAmount) {
+        if (owed.getAmount() >= amount) {
+            return 0.0;
+        } else {
+            return amount - owedAmount;
+        }
     }
 
 }
