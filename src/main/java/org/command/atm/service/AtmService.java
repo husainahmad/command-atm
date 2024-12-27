@@ -18,6 +18,7 @@ public class AtmService {
     }
 
     public Customer login(String name) {
+        setAllInactive();
         Customer customer = getCustomer(name);
         if (customer == null) {
             customer = Customer.createCustomer();
@@ -26,7 +27,6 @@ public class AtmService {
             insert(customer);
         }
         customer.setActive(true);
-        setAllInactive();
         update(customer);
         return customer;
     }
@@ -60,8 +60,7 @@ public class AtmService {
                 .toList();
 
         if (!owedList.isEmpty()) {
-            transferList(customer, owedList);
-            customer = getActiveCustomer();
+            return transferByOwedList(customer, owedList);
         }
 
         return customer;
@@ -73,6 +72,11 @@ public class AtmService {
 
     public Customer getCustomer(String name) {
         return customerRepository.getCustomerByName(name);
+    }
+
+    private Customer transferByOwedList(Customer customer, List<Owed> owedList) {
+        transferList(customer, owedList);
+        return getActiveCustomer();
     }
 
     private void transferList(Customer customer, List<Owed> oweds) {

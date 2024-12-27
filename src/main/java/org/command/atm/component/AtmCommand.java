@@ -2,7 +2,6 @@ package org.command.atm.component;
 
 import org.command.atm.model.Customer;
 import org.command.atm.model.Owed;
-import org.command.atm.model.OwedType;
 import org.command.atm.service.AtmService;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
@@ -63,22 +62,16 @@ public class AtmCommand {
 
         value.append(BALANCE);
         value.append(customer.getBalance());
-        value.append("\n");
 
         for (Owed owed : customer.getOweds().values()) {
-            if (!owed.isRemedy() && owed.getOwedType()== OwedType.TO) {
+            if (!owed.isRemedy()) {
+                value.append("\n");
                 value.append("Owed $")
                         .append(owed.getAmount())
-                        .append(" to ")
-                        .append(owed.getName())
-                        .append("\n");
-            }
-            if (!owed.isRemedy() && owed.getOwedType()== OwedType.FROM) {
-                value.append("Owed $")
-                        .append(owed.getAmount())
-                        .append(" from ")
-                        .append(owed.getName())
-                        .append("\n");
+                        .append(" ")
+                        .append(owed.getOwedType().toString().toLowerCase())
+                        .append(" ")
+                        .append(owed.getName());
             }
         }
         return value;
@@ -88,6 +81,6 @@ public class AtmCommand {
     public String logout() {
         Customer customer = atmService.getActiveCustomer();
         atmService.logout(customer);
-        return "Good bye ".concat(customer.getName());
+        return "Goodbye ".concat(customer.getName());
     }
 }
