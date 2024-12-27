@@ -1,6 +1,8 @@
 package org.command.atm.component;
 
-import org.command.atm.repository.Customer;
+import org.command.atm.model.Customer;
+import org.command.atm.model.Owed;
+import org.command.atm.model.OwedType;
 import org.command.atm.service.AtmService;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
@@ -19,18 +21,16 @@ public class AtmCommand {
     @ShellMethod(key = "login")
     public String login(@ShellOption String user) {
         Customer customer = atmService.login(user);
-        return "Hello, "
-                .concat(customer.getName())
-                .concat("!")
-                .concat("\n")
-                .concat(BALANCE)
-                .concat(String.valueOf(customer.getBalance()));
+        return "Hello ".concat(customer.getName())
+                .concat("!").concat("\n")
+                .concat(getStringBuilder(customer).toString());
     }
 
     @ShellMethod(key = "deposit")
     public String deposit(@ShellOption Double amount) {
         Customer customer = atmService.deposit(amount);
-        return BALANCE.concat(String.valueOf(customer.getBalance()));
+        StringBuilder value = getStringBuilder(customer);
+        return value.toString();
     }
 
     @ShellMethod(key = "withdraw")
@@ -44,14 +44,44 @@ public class AtmCommand {
         Customer customer = atmService.getActiveCustomer();
         Customer targetCustomer = atmService.getCustomer(target);
 
-        atmService.transfer(customer, targetCustomer, amount);
+        atmService.transfer(customer, targetCustomer, amount, null);
+        StringBuilder value = getStringBuilder(customer);
 
-        return "Transferred $" +
-                amount +
-                " to " +
-                targetCustomer.getName() +
-                "\n" +
-                BALANCE.concat(String.valueOf(customer.getBalance()));
+        return value.toString();
+    }
+
+    private static StringBuilder getStringBuilder(Customer customer) {
+        StringBuilder value = new StringBuilder();
+
+        customer.getDebits().forEach((s, debit) -> {
+            value.append("Transferred $");
+            value.append(debit.getAmount());
+            value.append(" to ");
+            value.append(debit.getName());
+            value.append("\n");
+        });
+
+        value.append(BALANCE);
+        value.append(customer.getBalance());
+        value.append("\n");
+
+        for (Owed owed : customer.getOweds().values()) {
+            if (!owed.isRemedy() && owed.getOwedType()== OwedType.TO) {
+                value.append("Owed $")
+                        .append(owed.getAmount())
+                        .append(" to ")
+                        .append(owed.getName())
+                        .append("\n");
+            }
+            if (!owed.isRemedy() && owed.getOwedType()== OwedType.FROM) {
+                value.append("Owed $")
+                        .append(owed.getAmount())
+                        .append(" from ")
+                        .append(owed.getName())
+                        .append("\n");
+            }
+        }
+        return value;
     }
 
     @ShellMethod(key = "logout")

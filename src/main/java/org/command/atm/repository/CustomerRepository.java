@@ -1,5 +1,6 @@
 package org.command.atm.repository;
 
+import org.command.atm.model.Customer;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
