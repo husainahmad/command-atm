@@ -40,8 +40,4 @@ public class CustomerRepository {
         return activeCustomer.get();
     }
 
-
-
-
-
 }
