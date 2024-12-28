@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 public class AccountConfig {
 
     @Bean
-    CustomerRepository getCustomerRepository() {
+    CustomerRepository customerRepository() {
         return new CustomerRepository();
     }
 }

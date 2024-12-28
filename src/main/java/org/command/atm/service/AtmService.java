@@ -87,48 +87,47 @@ public class AtmService {
         });
     }
 
-    public void transfer(Customer customer, Customer targetCustomer, Double amount, Owed owed) {
+    public void transfer(Customer sourceCustomer, Customer targetCustomer, Double amount, Owed owed) {
 
-        customer.setDebits(new HashMap<>());
+        sourceCustomer.setDebits(new HashMap<>());
         String id = UUID.randomUUID().toString();
 
-        List<Owed> owedList = customer.getOweds().values().stream()
+        List<Owed> owedList = sourceCustomer.getOweds().values().stream()
                 .filter(owedFrom -> !owedFrom.isRemedy() && owedFrom.getOwedType()==OwedType.FROM
                 && owedFrom.getName().equals(targetCustomer.getName()))
                 .toList();
 
         if (!owedList.isEmpty()) {
-            payOwed(customer, targetCustomer, amount, owedList, id);
+            payOwed(sourceCustomer, targetCustomer, amount, owedList, id);
             return;
         }
 
         double actualTransfer = amount;
-        double actualBalance = customer.getBalance() - amount;
+        double actualBalance = sourceCustomer.getBalance() - amount;
 
-        if (customer.getBalance()<amount) {
-            actualTransfer = customer.getBalance();
-            putOwed(id, customer, targetCustomer, amount - customer.getBalance(), OwedType.TO);
-            putOwed(id, targetCustomer, customer, amount - customer.getBalance(), OwedType.FROM);
+        if (sourceCustomer.getBalance()<amount) {
+            actualTransfer = sourceCustomer.getBalance();
+            putOwed(id, sourceCustomer, targetCustomer, amount - sourceCustomer.getBalance(), OwedType.TO);
+            putOwed(id, targetCustomer, sourceCustomer, amount - sourceCustomer.getBalance(), OwedType.FROM);
             actualBalance = 0.0;
         }
 
         if (owed!=null) {
-            remedyPreviousOwed(customer, targetCustomer, owed.getId());
+            remedyPreviousOwed(sourceCustomer, targetCustomer, owed.getId());
         }
 
-        customer.getDebits().put(id, createDebit(id, targetCustomer.getName(),
+        sourceCustomer.getDebits().put(id, createDebit(id, targetCustomer.getName(),
                 actualTransfer,
                 owed!=null ? DebitType.TRANSFER_OWED : DebitType.TRANSFER));
 
-        customer.setBalance(actualBalance);
-        update(customer);
+        sourceCustomer.setBalance(actualBalance);
+        update(sourceCustomer);
         targetCustomer.setBalance(targetCustomer.getBalance() + actualTransfer);
         update(targetCustomer);
     }
 
     private void payOwed(Customer customer, Customer targetCustomer, Double amount,
                                 List<Owed> owedList, String id) {
-        double originalAmount = amount;
 
         for (Owed owedFrom : owedList) {
             if (amount<=0) break;
@@ -140,14 +139,6 @@ public class AtmService {
             putOwed(id, targetCustomer, customer, owedAmount, OwedType.TO);
 
             remedyPreviousOwed(customer, targetCustomer, owedFrom.getId());
-        }
-
-        if (amount==0) {
-            customer.getDebits().put(id, createDebit(id, targetCustomer.getName(),
-                    originalAmount, DebitType.TRANSFER));
-
-            customer.setBalance(customer.getBalance() - amount);
-            update(customer);
         }
 
         targetCustomer.setBalance(targetCustomer.getBalance() + amount);

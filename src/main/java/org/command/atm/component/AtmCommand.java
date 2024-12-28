@@ -34,7 +34,7 @@ public class AtmCommand {
 
     @ShellMethod(key = "withdraw")
     public String withdraw(@ShellOption Double amount) {
-        return BALANCE.concat(String.valueOf(amount));
+        return BALANCE.concat(String.valueOf(amount.intValue()));
     }
 
     @ShellMethod(key = "transfer")
@@ -54,20 +54,20 @@ public class AtmCommand {
 
         customer.getDebits().forEach((s, debit) -> {
             value.append("Transferred $");
-            value.append(debit.getAmount());
+            value.append(debit.getAmount().intValue());
             value.append(" to ");
             value.append(debit.getName());
             value.append("\n");
         });
 
         value.append(BALANCE);
-        value.append(customer.getBalance());
+        value.append(customer.getBalance().intValue());
 
         for (Owed owed : customer.getOweds().values()) {
             if (!owed.isRemedy()) {
                 value.append("\n");
                 value.append("Owed $")
-                        .append(owed.getAmount())
+                        .append(owed.getAmount().intValue())
                         .append(" ")
                         .append(owed.getOwedType().toString().toLowerCase())
                         .append(" ")
@@ -81,6 +81,6 @@ public class AtmCommand {
     public String logout() {
         Customer customer = atmService.getActiveCustomer();
         atmService.logout(customer);
-        return "Goodbye, ".concat(customer.getName());
+        return "Goodbye, ".concat(customer.getName().concat("!"));
     }
 }
