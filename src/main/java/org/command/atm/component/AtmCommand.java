@@ -1,7 +1,8 @@
 package org.command.atm.component;
 
-import org.command.atm.model.Customer;
-import org.command.atm.model.Owed;
+import org.command.atm.exception.UserFoundException;
+import org.command.atm.repository.model.Customer;
+import org.command.atm.repository.model.Owed;
 import org.command.atm.service.AtmService;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
@@ -19,7 +20,13 @@ public class AtmCommand {
 
     @ShellMethod(key = "login")
     public String login(@ShellOption String user) {
-        Customer customer = atmService.login(user);
+        Customer customer;
+        try {
+            customer = atmService.login(user);
+        } catch (UserFoundException e) {
+            atmService.createCustomer(user);
+            customer = atmService.login(user);
+        }
         return "Hello, ".concat(customer.getName())
                 .concat("!").concat("\n")
                 .concat(getStringBuilder(customer).toString());

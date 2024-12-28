@@ -1,17 +1,18 @@
-package org.command.atm.model;
+package org.command.atm.repository.model;
 
-public class Debit {
+public class Owed {
 
     private String id;
     private String name;
     private Double amount;
-    private DebitType debitType;
+    private boolean remedy;
+    private OwedType owedType;
 
-    private Debit() {
+    private Owed() {
     }
 
-    public static Debit createDebit() {
-        return new Debit();
+    public static Owed createOwed() {
+        return new Owed();
     }
 
     public String getId() {
@@ -38,12 +39,20 @@ public class Debit {
         this.amount = amount;
     }
 
-    public DebitType getDebitType() {
-        return debitType;
+    public boolean isRemedy() {
+        return remedy;
     }
 
-    public void setDebitType(DebitType debitType) {
-        this.debitType = debitType;
+    public void setRemedy(boolean remedy) {
+        this.remedy = remedy;
+    }
+
+    public OwedType getOwedType() {
+        return owedType;
+    }
+
+    public void setOwedType(OwedType owedType) {
+        this.owedType = owedType;
     }
 
 }

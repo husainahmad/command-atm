@@ -1,8 +1,8 @@
 package org.command.atm.service;
 
-import org.command.atm.model.Customer;
-import org.command.atm.model.Owed;
-import org.command.atm.model.OwedType;
+import org.command.atm.repository.model.Customer;
+import org.command.atm.repository.model.Owed;
+import org.command.atm.repository.model.OwedType;
 import org.command.atm.repository.CustomerRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

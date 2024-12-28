@@ -1,7 +1,8 @@
 package org.command.atm.service;
 
-import org.command.atm.model.*;
+import org.command.atm.exception.UserFoundException;
 import org.command.atm.repository.CustomerRepository;
+import org.command.atm.repository.model.*;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -17,18 +18,19 @@ public class AtmService {
         this.customerRepository = customerRepository;
     }
 
-    public Customer login(String name) {
+    public Customer login(String name) throws UserFoundException {
         setAllInactive();
         Customer customer = getCustomer(name);
-        if (customer == null) {
-            customer = Customer.createCustomer();
-            customer.setName(name);
-            customer.setBalance(0.0);
-            insert(customer);
-        }
         customer.setActive(true);
         update(customer);
         return customer;
+    }
+
+    public void createCustomer(String name) {
+        Customer customer = Customer.createCustomer();
+        customer.setName(name);
+        customer.setBalance(0.0);
+        insert(customer);
     }
 
     public void logout(Customer customer) {
@@ -56,7 +58,7 @@ public class AtmService {
         update(customer);
 
         List<Owed> owedList = customer.getOweds().values().stream()
-                .filter(owed -> !owed.isRemedy() && owed.getOwedType()==OwedType.TO)
+                .filter(owed -> !owed.isRemedy() && owed.getOwedType()== OwedType.TO)
                 .toList();
 
         if (!owedList.isEmpty()) {
@@ -67,10 +69,14 @@ public class AtmService {
     }
 
     public Customer getActiveCustomer() {
-        return customerRepository.getActive();
+        Customer customer = customerRepository.getActive();
+        if (customer==null) throw new UserFoundException("No active customer, you must login first!");
+        return customer;
     }
 
     public Customer getCustomer(String name) {
+        Customer customer = customerRepository.getCustomerByName(name);
+        if (customer==null) throw new UserFoundException(String.format("Customer with given name [%s] not found!", name));
         return customerRepository.getCustomerByName(name);
     }
 

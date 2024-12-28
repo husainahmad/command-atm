@@ -1,4 +1,4 @@
-package org.command.atm.model;
+package org.command.atm.repository.model;
 
 import java.util.HashMap;
 import java.util.Map;
