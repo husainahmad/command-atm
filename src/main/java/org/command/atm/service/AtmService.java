@@ -92,13 +92,13 @@ public class AtmService {
         sourceCustomer.setDebits(new HashMap<>());
         String id = UUID.randomUUID().toString();
 
-        List<Owed> owedList = sourceCustomer.getOweds().values().stream()
+        List<Owed> owedListFrom = sourceCustomer.getOweds().values().stream()
                 .filter(owedFrom -> !owedFrom.isRemedy() && owedFrom.getOwedType()==OwedType.FROM
                 && owedFrom.getName().equals(targetCustomer.getName()))
                 .toList();
 
-        if (!owedList.isEmpty()) {
-            payOwed(sourceCustomer, targetCustomer, amount, owedList, id);
+        if (!owedListFrom.isEmpty()) {
+            payDebtOwed(sourceCustomer, targetCustomer, amount, owedListFrom, id);
             return;
         }
 
@@ -112,8 +112,13 @@ public class AtmService {
             actualBalance = 0.0;
         }
 
+        double targetBalance = targetCustomer.getBalance() + actualTransfer;
+
         if (owed!=null) {
             remedyPreviousOwed(sourceCustomer, targetCustomer, owed.getId());
+            if (owed.getOwedType().equals(OwedType.FROM)) {
+                targetBalance = targetCustomer.getBalance();
+            }
         }
 
         sourceCustomer.getDebits().put(id, createDebit(id, targetCustomer.getName(),
@@ -122,12 +127,12 @@ public class AtmService {
 
         sourceCustomer.setBalance(actualBalance);
         update(sourceCustomer);
-        targetCustomer.setBalance(targetCustomer.getBalance() + actualTransfer);
+        targetCustomer.setBalance(targetBalance);
         update(targetCustomer);
     }
 
-    private void payOwed(Customer customer, Customer targetCustomer, Double amount,
-                                List<Owed> owedList, String id) {
+    private void payDebtOwed(Customer customer, Customer targetCustomer, Double amount,
+                             List<Owed> owedList, String id) {
 
         for (Owed owedFrom : owedList) {
             if (amount<=0) break;

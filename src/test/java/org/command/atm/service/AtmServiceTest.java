@@ -154,10 +154,10 @@ class AtmServiceTest {
                         .concat(sourceCustomer.getName())
                         .concat(" should be 0.0"));
 
-        Assertions.assertEquals(Double.valueOf(180.0),
+        Assertions.assertEquals(Double.valueOf(210.0),
                 targetCustomer.getBalance(), "Target customer "
                         .concat(targetCustomer.getName())
-                        .concat(" should be 180.0"));
+                        .concat(" should be 210.0"));
 
         Owed owed = sourceCustomer.getOweds().values().stream()
                 .filter(owed1 -> !owed1.isRemedy()).findFirst().orElseThrow();
@@ -220,10 +220,10 @@ class AtmServiceTest {
                         .concat(sourceCustomer.getName())
                         .concat(" should be 90.0"));
 
-        Assertions.assertEquals(Double.valueOf(210.0),
+        Assertions.assertEquals(Double.valueOf(220.0),
                 targetCustomer.getBalance(), "Target customer "
                         .concat(targetCustomer.getName())
-                        .concat(" should be 210.0"));
+                        .concat(" should be 220.0"));
 
         Owed owed = sourceCustomer.getOweds().values().stream()
                 .filter(owed1 -> owed1.getId().equals("1")).findFirst().orElseThrow();
