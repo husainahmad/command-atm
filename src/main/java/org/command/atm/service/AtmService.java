@@ -98,14 +98,7 @@ public class AtmService {
         sourceCustomer.setDebits(new HashMap<>());
         String id = UUID.randomUUID().toString();
 
-        List<Owed> owedListFrom = sourceCustomer.getOweds().values().stream()
-                .filter(owedFrom -> !owedFrom.isRemedy() && owedFrom.getOwedType()==OwedType.FROM
-                && owedFrom.getName().equals(targetCustomer.getName())) .toList();
-
-        if (!owedListFrom.isEmpty()) {
-            payDebtOwed(sourceCustomer, targetCustomer, amount, owedListFrom, id);
-            return;
-        }
+        if (isHavingOwedFrom(sourceCustomer, targetCustomer, amount, id)) return;
 
         double actualTransfer = amount;
         double actualBalance = sourceCustomer.getBalance() - amount;
@@ -134,6 +127,18 @@ public class AtmService {
         update(sourceCustomer);
         targetCustomer.setBalance(targetBalance);
         update(targetCustomer);
+    }
+
+    private boolean isHavingOwedFrom(Customer sourceCustomer, Customer targetCustomer, Double amount, String id) {
+        List<Owed> owedListFrom = sourceCustomer.getOweds().values().stream()
+                .filter(owedFrom -> !owedFrom.isRemedy() && owedFrom.getOwedType()==OwedType.FROM
+                && owedFrom.getName().equals(targetCustomer.getName())) .toList();
+
+        if (!owedListFrom.isEmpty()) {
+            payDebtOwed(sourceCustomer, targetCustomer, amount, owedListFrom, id);
+            return true;
+        }
+        return false;
     }
 
     private void payDebtOwed(Customer customer, Customer targetCustomer, Double amount,

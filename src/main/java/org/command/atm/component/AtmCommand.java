@@ -1,12 +1,14 @@
 package org.command.atm.component;
 
 import org.command.atm.exception.UserFoundException;
+import org.command.atm.exception.handler.InvalidInputException;
 import org.command.atm.repository.model.Customer;
 import org.command.atm.repository.model.Owed;
 import org.command.atm.service.AtmService;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
+import org.springframework.validation.annotation.Validated;
 
 @ShellComponent
 public class AtmCommand {
@@ -33,7 +35,8 @@ public class AtmCommand {
     }
 
     @ShellMethod(key = "deposit")
-    public String deposit(@ShellOption Double amount) {
+    public String deposit(@ShellOption @Validated Double amount) {
+        if (amount == null || amount <1) throw new InvalidInputException("Deposit amount must be not empty and > 0");
         Customer customer = atmService.deposit(amount);
         StringBuilder value = getStringBuilder(customer);
         return value.toString();
@@ -46,7 +49,7 @@ public class AtmCommand {
 
     @ShellMethod(key = "transfer")
     public String transfer(@ShellOption String target, @ShellOption Double amount) {
-
+        if (amount == null || amount <1) throw new InvalidInputException("Transfer amount must be not empty and > 0");
         Customer customer = atmService.getActiveCustomer();
         Customer targetCustomer = atmService.getCustomer(target);
 

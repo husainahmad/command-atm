@@ -12,7 +12,7 @@ public class GlobalErrorHandler implements CommandExceptionResolver {
 
     @Override
     public CommandHandlingResult resolve(Exception ex) {
-        if (ex instanceof UserFoundException) {
+        if (ex instanceof UserFoundException || ex instanceof InvalidInputException) {
             return CommandHandlingResult.of(ex.getMessage().concat("\n"), 42);
         }
         if (ex instanceof ConversionFailedException) {

@@ -1,5 +1,6 @@
 package org.command.atm.service;
 
+import org.command.atm.exception.UserFoundException;
 import org.command.atm.repository.model.Customer;
 import org.command.atm.repository.model.Owed;
 import org.command.atm.repository.model.OwedType;
@@ -27,8 +28,7 @@ class AtmServiceTest {
     void testLoginUnregisteredAccount() {
         String loginName = "Ahmad";
         Mockito.when(customerRepository.getCustomerByName(any(String.class))).thenReturn(null);
-        Customer customer = atmService.login(loginName);
-        Assertions.assertTrue(customer.isActive(), "Status active customer should be true");
+        Assertions.assertThrows(UserFoundException.class, () -> atmService.login(loginName));
     }
 
     @Test
