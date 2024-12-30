@@ -20,10 +20,6 @@ public class CustomerRepository {
         customerMap.put(customer.getName(), customer);
     }
 
-    public void setAllInactive() {
-        customerMap.forEach((s, customer) -> customer.setActive(false));
-    }
-
     public void update(Customer customer) {
         customerMap.put(customer.getName(), customer);
     }

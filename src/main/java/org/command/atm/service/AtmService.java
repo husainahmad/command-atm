@@ -1,6 +1,6 @@
 package org.command.atm.service;
 
-import org.command.atm.exception.UserFoundException;
+import org.command.atm.exception.UserNotFoundException;
 import org.command.atm.repository.CustomerRepository;
 import org.command.atm.repository.model.*;
 import org.springframework.stereotype.Service;
@@ -18,8 +18,7 @@ public class AtmService {
         this.customerRepository = customerRepository;
     }
 
-    public Customer login(String name) throws UserFoundException {
-        setAllInactive();
+    public Customer login(String name) throws UserNotFoundException {
         Customer customer = getCustomer(name);
         customer.setActive(true);
         update(customer);
@@ -37,10 +36,6 @@ public class AtmService {
         customer.setActive(false);
         customer.setDebits(new HashMap<>());
         update(customer);
-    }
-
-    private void setAllInactive() {
-        customerRepository.setAllInactive();
     }
 
     private void update(Customer customer) {
@@ -70,13 +65,17 @@ public class AtmService {
 
     public Customer getActiveCustomer() {
         Customer customer = customerRepository.getActive();
-        if (customer==null) throw new UserFoundException("No active customer, you must login first!");
+        if (customer==null) throw new UserNotFoundException("No active customer, you must login first!");
         return customer;
+    }
+
+    public boolean isAnyActiveCustomer() {
+        return customerRepository.getActive() != null;
     }
 
     public Customer getCustomer(String name) {
         Customer customer = customerRepository.getCustomerByName(name);
-        if (customer==null) throw new UserFoundException(String.format("Customer with given name [%s] not found!", name));
+        if (customer==null) throw new UserNotFoundException(String.format("Customer with given name [%s] not found!", name));
         return customerRepository.getCustomerByName(name);
     }
 

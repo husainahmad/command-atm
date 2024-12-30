@@ -16,17 +16,7 @@ class AtmCommandTest {
     private AtmCommand atmCommand;
 
     @Test
-    void testLoginAlice()  {
-        String loginName = "Alice";
-        String result = atmCommand.login(loginName);
-        String expected = "Hello, ".concat(loginName).concat("!\n")
-                .concat("Your balance is $0");
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(expected, result);
-    }
-
-    @Test
-    void testLogoutAlice()  {
+    void testLogin()  {
         String loginName = "Alice";
         String result = atmCommand.login(loginName);
         String expected = "Hello, ".concat(loginName).concat("!\n")
@@ -34,10 +24,7 @@ class AtmCommandTest {
         Assertions.assertNotNull(result);
         Assertions.assertEquals(expected, result);
 
-        result = atmCommand.logout();
-        expected = "Goodbye, Alice!";
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(expected, result);
+        testLogout(loginName);
     }
 
     @Test
@@ -48,6 +35,8 @@ class AtmCommandTest {
         String expected = "Your balance is $100";
         Assertions.assertNotNull(result);
         Assertions.assertEquals(expected, result);
+
+        testLogout(loginName);
     }
 
     @Test
@@ -121,11 +110,7 @@ class AtmCommandTest {
         Assertions.assertNotNull(result);
         Assertions.assertEquals(expected, result);
 
-        result = atmCommand.logout();
-        expected = "Goodbye, ".concat(loginName).concat("!");
-
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(expected, result);
+        testLogout(loginName);
     }
 
     private void loginAsBob() {
@@ -166,12 +151,14 @@ class AtmCommandTest {
         Assertions.assertNotNull(result);
         Assertions.assertEquals(expected, result);
 
-        result = atmCommand.logout();
-        expected = "Goodbye, Bob!";
+        testLogout(loginName);
+    }
+
+    void testLogout(String name) {
+        String result = atmCommand.logout();
+        String expected = "Goodbye, ".concat(name).concat("!");
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(expected, result);
     }
-
-
 }

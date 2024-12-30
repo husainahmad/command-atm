@@ -1,6 +1,7 @@
 package org.command.atm.component;
 
-import org.command.atm.exception.UserFoundException;
+import org.command.atm.exception.UserNotFoundException;
+import org.command.atm.exception.handler.IllegalStateException;
 import org.command.atm.exception.handler.InvalidInputException;
 import org.command.atm.repository.model.Customer;
 import org.command.atm.repository.model.Owed;
@@ -23,9 +24,11 @@ public class AtmCommand {
     @ShellMethod(key = "login")
     public String login(@ShellOption String user) {
         Customer customer;
+        if (atmService.isAnyActiveCustomer()) throw new IllegalStateException("You are in logged in session, " +
+                "please logout and login again");
         try {
             customer = atmService.login(user);
-        } catch (UserFoundException e) {
+        } catch (UserNotFoundException e) {
             atmService.createCustomer(user);
             customer = atmService.login(user);
         }
