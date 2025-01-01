@@ -40,7 +40,7 @@ class AtmCommandTest {
     }
 
     @Test
-    void testIntegration() {
+    void testIntegration30() {
 
         loginAsAlice();
 
@@ -81,6 +81,57 @@ class AtmCommandTest {
         result = atmCommand.deposit(100.0);
         expected = "Transferred $10 to Alice".concat("\n")
                 .concat("Your balance is $90");
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(expected, result);
+
+        result = atmCommand.logout();
+        expected = "Goodbye, Bob!";
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(expected, result);
+    }
+
+    @Test
+    void testIntegration100() {
+
+        loginAsAlice();
+
+        loginAsBob();
+
+        //Login Alice
+        String loginName = "Alice";
+        String result = atmCommand.login(loginName);
+        String expected = "Hello, ".concat(loginName).concat("!\n")
+                .concat("Your balance is $210").concat("\n")
+                .concat("Owed $40 from Bob");
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(expected, result);
+
+        result = atmCommand.transfer("Bob", 100.0);
+        expected = "Transferred $60 to Bob\n" +
+                "Your balance is $150";
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(expected, result);
+
+        result = atmCommand.logout();
+        expected = "Goodbye, Alice!";
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(expected, result);
+
+        loginName = "Bob";
+        result = atmCommand.login(loginName);
+        expected = "Hello, ".concat(loginName).concat("!\n")
+                .concat("Your balance is $60");
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(expected, result);
+
+        result = atmCommand.deposit(100.0);
+        expected = "Your balance is $160";
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(expected, result);

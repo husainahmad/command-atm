@@ -97,7 +97,9 @@ public class AtmService {
         sourceCustomer.setDebits(new HashMap<>());
         String id = UUID.randomUUID().toString();
 
-        if (isHavingOwedFrom(sourceCustomer, targetCustomer, amount, id)) return;
+        amount = amountAgerHavingOwedFrom(sourceCustomer, targetCustomer, amount, id);
+
+        if (amount==0) return;
 
         double actualTransfer = amount;
         double actualBalance = sourceCustomer.getBalance() - amount;
@@ -128,20 +130,19 @@ public class AtmService {
         update(targetCustomer);
     }
 
-    private boolean isHavingOwedFrom(Customer sourceCustomer, Customer targetCustomer, Double amount, String id) {
+    private double amountAgerHavingOwedFrom(Customer sourceCustomer, Customer targetCustomer, Double amount, String id) {
         List<Owed> owedListFrom = sourceCustomer.getOweds().values().stream()
                 .filter(owedFrom -> !owedFrom.isRemedy() && owedFrom.getOwedType()==OwedType.FROM
                 && owedFrom.getName().equals(targetCustomer.getName())) .toList();
 
         if (!owedListFrom.isEmpty()) {
-            payDebtOwed(sourceCustomer, targetCustomer, amount, owedListFrom, id);
-            return true;
+            return amountAfterPayDebtOwed(sourceCustomer, targetCustomer, amount, owedListFrom, id);
         }
-        return false;
+        return amount;
     }
 
-    private void payDebtOwed(Customer customer, Customer targetCustomer, Double amount,
-                             List<Owed> owedList, String id) {
+    private double amountAfterPayDebtOwed(Customer customer, Customer targetCustomer, Double amount,
+                                          List<Owed> owedList, String id) {
 
         for (Owed owedFrom : owedList) {
             if (amount<=0) break;
@@ -149,14 +150,14 @@ public class AtmService {
             double owedAmount = getOwedAmount(owedFrom, amount);
             amount = getAmount(owedFrom, amount, owedAmount);
 
-            putOwedToCustomer(id, customer, targetCustomer, owedAmount, OwedType.FROM);
-            putOwedToCustomer(id, targetCustomer, customer, owedAmount, OwedType.TO);
-
+            if (amount==0) {
+                putOwedToCustomer(id, customer, targetCustomer, owedAmount, OwedType.FROM);
+                putOwedToCustomer(id, targetCustomer, customer, owedAmount, OwedType.TO);
+            }
             remedyPreviousOwed(customer, targetCustomer, owedFrom.getId());
         }
 
-        targetCustomer.setBalance(targetCustomer.getBalance() + amount);
-        update(targetCustomer);
+        return amount;
     }
 
     private void remedyPreviousOwed(Customer customer, Customer targetCustomer, String key) {
