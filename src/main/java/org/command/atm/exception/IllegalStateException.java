@@ -1,4 +1,4 @@
-package org.command.atm.exception.handler;
+package org.command.atm.exception;
 
 public class IllegalStateException extends RuntimeException {
     public IllegalStateException(String s) {

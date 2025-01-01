@@ -1,8 +1,8 @@
 package org.command.atm.component;
 
 import org.command.atm.exception.UserNotFoundException;
-import org.command.atm.exception.handler.IllegalStateException;
-import org.command.atm.exception.handler.InvalidInputException;
+import org.command.atm.exception.IllegalStateException;
+import org.command.atm.exception.InvalidInputException;
 import org.command.atm.repository.model.Customer;
 import org.command.atm.repository.model.Owed;
 import org.command.atm.service.AtmService;
